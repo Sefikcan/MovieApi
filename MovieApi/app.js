@@ -14,6 +14,14 @@ var app = express();
 //db connection
 const db = require('./helper/db')();
 
+//config
+const config = require('./config');
+//global olarak kullanabileceğimiz key'i burada tanımladık
+app.set('api_secret_key',config.api_secret_key);
+
+//middleware
+const verifyToken = require('./middleware/verify-token');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -27,6 +35,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+//Alttaki satırı ekleyerek url'lerin tokensiz işlem yapmasını engelledik
+app.use('/api',verifyToken);
 app.use('/api/movie', moviesRouter);
 app.use('/api/director',directorRouter);
 
